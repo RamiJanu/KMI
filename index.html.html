@@ -1,0 +1,210 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KMI Skaičiuoklė</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border: 2px solid black;
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            margin-top: 20px;
+            background-color: #5A67D8;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: background 0.3s ease-in-out;
+        }
+        button:hover {
+            background-color: #434190;
+        }
+        .error {
+            color: red;
+            font-size: 14px;
+        }
+	.table-container {
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: center;
+	    word-break: break-word;
+        }
+        th {
+            background-color: #5A67D8;
+            color: white;
+        }
+
+	#result {
+    font-size: 24px;
+    font-weight: bold;
+    color: #5A67D8;
+    background-color: #E2E8F0;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 30px;
+    text-align: center;
+}
+ @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+            }
+            th, td {
+                font-size: 14px;
+                padding: 8px;
+            }
+            table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>KMI Skaičiuoklė</h1>
+        <form id="kmiForm">
+            <label for="height">Jūsų ūgis (cm):</label>
+            <input type="number" id="height" required>
+            <label for="weight">Jūsų kūno svoris (kg):</label>
+            <input type="number" id="weight" required>
+            <button type="button" onclick="calculateBMI()">Apskaičiuoti</button>
+            <div id="result"></div>
+            <div class="error" id="errorMessage"></div>
+        </form>
+    </div>
+    <div class="container">
+        <h1>Mitybos rekomendacijos</h1>
+        <form>
+            <label for="kmiInput">Jūsų KMI:</label>
+            <input type="number" id="kmiInput" step="0.1" required>
+	    <label for="age">Amžius:</label>
+            <input type="number" id="age" required>
+            <label for="gender">Lytis:</label>
+            <select id="gender" required>
+                <option value="male">Vyras</option>
+                <option value="female">Moteris</option>
+            </select>
+            <label for="activityLevel">Fizinio aktyvumo lygis:</label>
+            <select id="activityLevel" required>
+                <option value="sedentary">Sėdimas</option>
+                <option value="light">Lengvas</option>
+                <option value="moderate">Vidutinis</option>
+                <option value="high">Aukštas</option>
+            </select>
+            <button type="button" onclick="calculateNutrition()">Apskaičiuoti</button>
+        </form>
+        <table>
+            <thead>
+                <tr>
+                    <th>Kalorijos</th>
+                    <th>Baltymai (g)</th>
+                    <th>Angliavandeniai (g)</th>
+                    <th>Riebalai (g)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td id="calories"></td>
+                    <td id="protein"></td>
+                    <td id="carbs"></td>
+                    <td id="fats"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <script>
+         // JavaScript
+        function calculateBMI() {
+        const weight = parseFloat(document.getElementById('weight').value);
+        const height = parseFloat(document.getElementById('height').value) / 100;
+        const resultElement = document.getElementById('result');
+        const errorMessageElement = document.getElementById('errorMessage');
+
+        
+        if (isNaN(weight) || isNaN(height) || weight <= 0 || height <= 0) {
+            errorMessageElement.innerText = "Prašome įvesti visus duomenis teisingai.";
+            resultElement.innerText = "";
+            return;
+        }
+
+        errorMessageElement.innerText = "";
+ 
+        const bmi = (weight / (height * height)).toFixed(1);
+        let category = "";
+ 
+        if (bmi < 18.5) {
+            category = "Nepakankamas svoris";
+        } else if (bmi < 25) {
+            category = "Normalus svoris";
+        } else if (bmi < 30) {
+            category = "Antsvoris";
+        } else if (bmi < 35) {
+            category = "I° nutukimas";
+        } else if (bmi < 40) {
+            category = "II° nutukimas";
+        } else {
+            category = "III° (liguistas) nutukimas";
+        }
+
+        resultElement.innerText = `Jūsų KMI: ${bmi} (${category})`;
+        document.getElementById('kmiInput').value = bmi;
+    }
+		
+
+function calculateNutrition() {
+            const kmi = parseFloat(document.getElementById('kmiInput').value);
+            const activityLevel = document.getElementById('activityLevel').value;
+            const height = parseFloat(document.getElementById('height').value) /100;
+            const weight = kmi * height * height;
+            const gender = document.getElementById('gender').value;
+            const age = parseInt(document.getElementById('age').value);
+            let bmr = gender === "male" ? ((10 * weight) + (6.25 * height*100) - (5 * age) + 5) : ((10 * weight) + (6.25 * height*100) - (5 * age) - 161);
+            let activityFactor = { sedentary: 1.2, light: 1.375, moderate: 1.55, high: 1.725 }[activityLevel];
+            let calories = bmr * activityFactor;
+            document.getElementById('calories').innerText = Math.round(calories);
+            document.getElementById('protein').innerText = Math.round((calories * 0.15) / 4);
+            document.getElementById('carbs').innerText = Math.round((calories * 0.55) / 4);
+            document.getElementById('fats').innerText = Math.round((calories * 0.30) / 9);
+        }
+    </script>
+</body>
+</html>
